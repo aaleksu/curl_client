@@ -2,7 +2,7 @@
 
 namespace CurlClient\Result;
 
-class SampleCurlResult extends AbstractCurlResult
+class JsonCurlResult extends AbstractCurlResult
 {
 	public function toArray()
 	{
@@ -13,3 +13,4 @@ class SampleCurlResult extends AbstractCurlResult
 	{
 	}
 }
+

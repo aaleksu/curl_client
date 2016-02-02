@@ -15,8 +15,16 @@ abstract class AbstractCurlClient
 
 	public function __construct()
 	{
-		$this->init();
 		$this->initResult();
+	}
+
+	public function ch()
+	{
+		if($this->ch == null) {
+			$this->ch = curl_init();
+		}
+
+		return $this->ch;
 	}
 
 	public function exec()
@@ -27,16 +35,17 @@ abstract class AbstractCurlClient
 			$this->asPost();
 		}
 
-		curl_setopt_array($this->ch, [
+		curl_setopt_array($this->ch(), [
 			CURLOPT_URL, $this->getUrl(),
 			CURLOPT_RETURNTRANSFER => true,
 		]);
 
-		$result = curl_exec($this->ch);
+		$result = curl_exec($this->ch());
 		$this->result->set($result);
-		$this->error = curl_error($this->ch);
+		$this->error = curl_error($this->ch());
 
-		curl_close($this->ch);
+		curl_close($this->ch());
+		$this->clear();
 
 		return $this;
 	}
@@ -49,7 +58,7 @@ abstract class AbstractCurlClient
 	public function setUrl($url)
 	{
 		$this->url = $url;
-		curl_setopt($this->ch, CURLOPT_URL, $url);
+		curl_setopt($this->ch(), CURLOPT_URL, $url);
 
 		return $this;
 	}
@@ -87,7 +96,7 @@ abstract class AbstractCurlClient
 
 	public function setOption($option, $value)
 	{
-		curl_setopt($this->ch, $option, $value);
+		curl_setopt($this->ch(), $option, $value);
 
 		return $this;
 	}
@@ -103,13 +112,14 @@ abstract class AbstractCurlClient
 
 	public function setHeaders()
 	{
-		curl_setopt($this->ch, CURLOPT_HTTPHEADER, $this->headers);
+		curl_setopt($this->ch(), CURLOPT_HTTPHEADER, $this->headers);
 	}
 
-	public function init()
+	public function clear()
 	{
-		$this->ch = curl_init();
+		$this->ch = null;
 		$this->postData = [];
+		$this->headers = [];
 	}
 
 	private function validate()
@@ -123,3 +133,4 @@ abstract class AbstractCurlClient
 		}
 	}
 }
+
