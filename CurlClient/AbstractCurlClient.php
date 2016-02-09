@@ -9,6 +9,7 @@ abstract class AbstractCurlClient
 	private $postData = [];
 	private $headers = []; 
 	private $error;
+	private $beforeCallback;
 	protected $result;
 
 	abstract public function initResult();
@@ -29,6 +30,10 @@ abstract class AbstractCurlClient
 
 	public function exec()
 	{
+		if($this->beforeCallback != null) {
+			call_user_func($this->beforeCallback);
+		}
+
 		$this->validate();
 
 		if(!empty($this->postData)) {
@@ -120,6 +125,18 @@ abstract class AbstractCurlClient
 		$this->ch = null;
 		$this->postData = [];
 		$this->headers = [];
+	}
+
+	protected setBeforeCallback($callback)
+	{
+		$this->beforeCallback = $callback;
+	}
+
+	private function validateBeforeCallback()
+	{
+		if(!is_callable($this->beforeCallback)) {
+			throw new \Exception('Wrong callback; beforeCallback must be callable');
+		}
 	}
 
 	private function validate()
